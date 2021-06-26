@@ -1,47 +1,65 @@
+
+
 body {
+    margin: 0;
+    font-size: 14px;
+    color: #242423;
+    padding: 0;
+    height: 100%;
+    background-color: #F5CB5C;
+
     display: flex;
-    margin-top: 32px;
+    margin-top: 3rem;
     justify-content: space-between;
-    font-family: sans-serif;
+    font-family: "Nunito", sans-serif;
     flex-direction: column;
     align-items: center;
 }
 
+
+p {
+    font-family: serif;
+    text-indent: 2em;
+}
+
+a:visited {
+    color: #242423;
+    text-decoration: none;
+}
+
+
 main {
+    margin-top: 5rem;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
     flex-wrap: wrap;
-    width: 100%;
+    width: 90%;
+
     max-width: 920px;
 }
 
-#ad-unit {
-    width: 65%;
-    margin: auto;
-}
 
 #buttons button {
     width: 50%;
     border-radius: 0;
-    border: thin solid #353535;
-    background-color: black;
+    border: thin solid #CFDBD5;
+    background-color: #242423;
     transition: all 300ms;
 }
 
 #buttons button:hover {
     transition: all 300ms;
-    background-color: white;
-    color: black;
+    background-color: #F4F1F1;
+    color: #242423;
 }
 
 
 #spin-wheel {
-    background-color: #000000;
+    background-color: #242423;
     font-size: 1.45em;
     height: 3em;
     width: 100%;
-    font-style: italic;
 }
 
 #buttons {
@@ -55,8 +73,8 @@ main {
     overflow-y: scroll;
     height: 350px;
     border-radius: 4px 4px 0 0;
-    border: thin solid #eaeaea;
-    box-shadow: inset 0 0 2px 1px rgba(151, 151, 151, 0.09);
+    border: thin solid #E8EDDF;
+    /* box-shadow: inset 0 0 2px 1px rgba(151, 151, 151, 0.09); */
 }
 
 
@@ -69,32 +87,33 @@ main {
 }
 
 .right-pane {
-    border: 4px solid black;
-    border-radius: 8px 8px 0 0;
-    padding: 8px;
-    margin: 8px;
+    border: 4px solid #333533;
+    border-radius: 1rem 1rem 0 0;
+    padding: 1rem;
+    margin: 1rem;
     display: flex;
     justify-content: space-between;
     flex-direction: column;
-    width: 256px;
+    /* width: 256px; */
+    flex: 1;
 }
 
 
 #canvas {
     padding-left: 0;
     padding-right: 0;
+    margin: 0;
     display: block;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-    border: 3px solid black;
+    /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    border: 3px solid #242423; */
     border-radius: 300px;
-    width: 512px;
-    height: 512px;
+    flex: 2;
 }
 
 
 /*Label With Action*/
 .labeled-action {
-    margin: 8px;
+    margin: 1rem;
     height: 32px;
     display: flex;
     flex-direction: row;
@@ -102,12 +121,12 @@ main {
     align-items: center;
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
-    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.12);
+    /* box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.12); */
     text-overflow: ellipsis;
 }
 
 .labeled-action div {
-    padding: 8px;
+    padding: 1rem;
     text-overflow: ellipsis;
     display: block;
     white-space: nowrap;
@@ -119,6 +138,7 @@ main {
     font-size: 14px;
     border-style: none;
     flex-grow: .7;
+    border-radius: 5px;
 }
 
 input:focus {
@@ -128,8 +148,8 @@ input:focus {
 .labeled-action button {
     height: 32px;
     width: 32px;
-    background-color: #000000;
-    color: white;
+    background-color: #242423;
+    color: #F4F1F1;
     border-bottom-right-radius: 4px;
     border-top-right-radius: 4px;
     border-style: none;
@@ -138,7 +158,7 @@ input:focus {
 
 .labeled-action button:active {
     outline: none;
-    box-shadow: inset 0 3px 5px 0 rgba(0, 0, 0, 0.12);
+    /* box-shadow: inset 0 3px 5px 0 rgba(0, 0, 0, 0.12); */
 }
 
 .labeled-action button:focus {
@@ -147,23 +167,39 @@ input:focus {
 
 .labeled-action button:hover {
     transition: all 300ms;
-    background-color: white;
-    color: black;
-    border: thin solid black;
+    background-color: #F4F1F1;
+    color: #242423;
+    border: thin solid #242423;
 }
 
-.footer {
-    margin-top: 16px;
-    opacity: .5;
-    text-decoration: none;
+
+/* Button Look And Feels */
+.stock {
+    border-style: none;
+    color: #ffffff;
+    width: 128px;
+    height: 32px;
+    font-size: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    font-weight: bold;
+    outline: none;
+    text-transform: uppercase;
+    border-radius: 3px;
+    transition: box-shadow .025s;
 }
 
-.footer a {
-    text-decoration: none;
+.stock:active {
+    box-shadow: 0 0 0;
+    transition: box-shadow .025s;
 }
 
 @media (max-width: 425px) {
+    .right-pane {
+        width: unset;
+    }
+    
     main {
+        margin-top: 1rem;
         flex-direction: column-reverse;
         align-items: center;
         justify-content: flex-start;

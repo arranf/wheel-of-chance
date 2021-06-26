@@ -1,56 +1,47 @@
-var CANVAS_MID_X;
-var CANVAS_MID_Y;
-var WHEEL_PERCENTAGE = .975;
-var WHEEL_RADIUS;
-var ROTATION_RESISTANCE =  -45;
-var ENTER_KEY = 13;
-var MAX_ROTATION_SPEED = 450;
+let CANVAS_MID_X;
+let CANVAS_MID_Y;
+const WHEEL_PERCENTAGE = 0.975;
+let WHEEL_RADIUS;
+const ROTATION_RESISTANCE = -360;
+const ENTER_KEY = 13;
+const MAX_ROTATION_SPEED = 4500;
+const CHROME_COLOR = "#242423";
+const WEDGE_COLOR_A = "#6C8EAD";
+const WEDGE_COLOR_B = "#5FAD41"; //B7AD9C
+const WEDGE_COLOR_C = "#F694C1";
+const WEDGE_COLOR_D = "#FFFFFF";
 
-var lastTime;
-var delta;
-var runTime = 0.0;
-var canvas = document.getElementById('canvas');
-var context = canvas.getContext('2d');
-var wedgeColorA = '#AAAAAA';
-var wedgeColorB = '#BBBBBB';
-var wedgeColorC = '#DDDDDD';
-var wedgeColorD = '#CCCCCC';
-var wedgeSubdiv;
-var wheelRotation = 90;
-var rotationSpeed = 0;
+let lastTime;
+let delta;
+let runTime = 0.0;
+let canvas = document.getElementById("canvas");
+let context = canvas.getContext("2d");
 
-var btn_addWedge = document.getElementById('add-wedge');
-var wedge_input = document.getElementById('wedge-input');
-var wedge_list = document.getElementById('wedge-list');
-var spin_wheel = document.getElementById('spin-wheel');
-var clear_list = document.getElementById('clear-list');
-var copy_link = document.getElementById('copy-link');
-var templates = document.getElementById('templates');
-var clipboard = document.getElementById('clipboard');
+let wedgeSubdiv;
+let wheelRotation = 90;
+let rotationSpeed = 0;
+
+let btn_addWedge = document.getElementById("add-wedge");
+let wedge_input = document.getElementById("wedge-input");
+let wedge_list = document.getElementById("wedge-list");
+let spin_wheel = document.getElementById("spin-wheel");
+let clear_list = document.getElementById("clear-list");
+let copy_link = document.getElementById("copy-link");
+let clipboard = document.getElementById("clipboard");
+
+const mobile_break = 425;
+const desktop_canvas_size = 500;
+const mobile_canvas_size = 500;
+const wedge_text_position = 0.65; // Distance Along Radius
+const blank_message = "Add some values in the pane.";
 
 
-var mobile_break = 425;
-var desktop_canvas_size = 500;
-var mobile_canvas_size = 500;
-var wedge_text_position = .65; // Distance Along Radius
+let is_mobile = false;
+let items = [];
+let last_width = 0;
+let dirty = false;
 
-var nameList = [];
-var name_lists = [
-  ['E.Honda', 'Chun Li', 'M.Bison', 'Cammy'],
-  ['Ringo', 'George', 'John', 'Paul'],
-  ['Roy', 'Gee', 'Biv'],
-  ['Tina', 'Chris', 'David', 'Jerry'],
-  ['Like This', 'Like That'],
-  ['Mystery', 'Comedy', 'Action', 'Drama'],
-  ['Charmander', 'Squirtle', 'Bulbasaur'],
-  ['Rock', 'Paper', 'Scissors']
-];
-
-var blank_message = 'Add some values in the pane.';
-var is_mobile = false;
-var last_width = 0;
-var dirty = false;
-
+// 
 function setup() {
   clipboard.style.opacity = 0;
   clipboard.style.width = 0;
@@ -60,24 +51,22 @@ function setup() {
   WHEEL_RADIUS = CANVAS_MID_X * WHEEL_PERCENTAGE;
   lastTime = Date.now();
 
-  var saved_list = JSON.parse(localStorage.getItem('wheel_items'));
+  let saved_list = JSON.parse(localStorage.getItem("wheel_items"));
 
-  if (!saved_list || !saved_list.length) {
-    nameList = name_lists[getRandomInt(0, name_lists.length)];
-  } else {
-    nameList = saved_list;
+  if (saved_list && saved_list.length) {
+    items = saved_list;
   }
 
-  var hash = window.location.hash;
-  var hashString = hash.substr(1, hash.length - 1);
+  let hash = window.location.hash;
+  let hashString = hash.substr(1, hash.length - 1);
   if (hashString.length) {
-    var queryList = JSON.parse(decodeURIComponent(hashString));
+    let queryList = JSON.parse(decodeURIComponent(hashString));
     if (queryList.length) {
-      nameList = queryList;
+      items = queryList;
     }
   }
 
-  checkIfMobile();
+  resizeIfMobile();
   resizeCanvas();
   registerInputListeners();
   renderList();
@@ -90,36 +79,40 @@ function refreshList() {
   if (!dirty) {
     dirty = true;
   } else {
-    localStorage.setItem('wheel_items', JSON.stringify(nameList));
+    localStorage.setItem("wheel_items", JSON.stringify(items));
   }
 }
 
 function addItem() {
   if (wedge_input && !wedge_input.value) return;
-  nameList.push(wedge_input.value);
-  wedge_input.value = '';
-  refreshList()
+  items.push(wedge_input.value);
+  wedge_input.value = "";
+  refreshList();
 }
 
 function removeItem(index) {
-  nameList.splice(index, 1);
+  items.splice(index, 1);
   refreshList();
 }
 
 function spinWheel() {
-  rotationSpeed += (MAX_ROTATION_SPEED / 2) * (Math.random() * (1.75 - .75) + .75);
-  rotationSpeed = rotationSpeed > MAX_ROTATION_SPEED ? MAX_ROTATION_SPEED : rotationSpeed;
+  rotationSpeed +=
+    (MAX_ROTATION_SPEED / 2) * (Math.random() * (1.75 - 0.75) + 0.75);
+  rotationSpeed =
+    rotationSpeed > MAX_ROTATION_SPEED ? MAX_ROTATION_SPEED : rotationSpeed;
 }
 
 function clearList() {
-  nameList = [];
+  items = [];
   refreshList();
 }
 
 function copyLink() {
-  clipboard.innerText = encodeURI( window.location.href + '#' + JSON.stringify(nameList) );
+  clipboard.innerText = encodeURI(
+    window.location.href + "#" + JSON.stringify(items)
+  );
   clipboard.select();
-  document.execCommand('copy');
+  document.execCommand("copy");
   clipboard.blur();
 }
 
@@ -133,7 +126,7 @@ function resizeCanvas() {
   WHEEL_RADIUS = CANVAS_MID_X * WHEEL_PERCENTAGE;
 }
 
-function checkIfMobile() {
+function resizeIfMobile() {
   is_mobile = window.innerWidth < mobile_break;
   if (last_width > mobile_break && is_mobile) {
     resizeCanvas();
@@ -149,7 +142,7 @@ function checkIfMobile() {
 function registerInputListeners() {
   btn_addWedge.onclick = addItem;
   wedge_input.onkeyup = function (e) {
-    if (e.keyCode === ENTER_KEY) {
+    if (e.key === 'Enter') {
       addItem();
     }
   };
@@ -159,26 +152,26 @@ function registerInputListeners() {
 }
 
 function renderList() {
-  var record_elem = templates.getElementsByTagName('listitem')[0];
+  let record_elem = templates.getElementsByTagName("listitem")[0];
   if (record_elem && wedge_list) {
     wedge_list.innerHTML = null;
-    var i = 0;
-    nameList.forEach(function (elem) {
-      var template = record_elem.innerHTML;
-      var instance = document.createElement('div');
+    let i = 0;
+    items.forEach(function (elem) {
+      let template = record_elem.innerHTML;
+      let instance = document.createElement("div");
       instance.innerHTML = template;
-      var content = instance.getElementsByClassName('content')[0];
-      var button = instance.getElementsByTagName('button')[0];
+      let content = instance.getElementsByClassName("content")[0];
+      let button = instance.getElementsByTagName("button")[0];
       if (content && button) {
-        content.innerHTML = '';
-        var contentDiv = document.createElement('span');
+        content.innerHTML = "";
+        let contentDiv = document.createElement("span");
         contentDiv.innerText = elem;
         content.appendChild(contentDiv);
-        button.setAttribute('data-id', i + '');
+        button.setAttribute("data-id", i + "");
         button.onclick = function (e) {
-          var id = e.target.getAttribute('data-id');
+          let id = e.target.getAttribute("data-id");
           if (!id) {
-            id = e.target.parentNode.getAttribute('data-id');
+            id = e.target.parentNode.getAttribute("data-id");
           }
           removeItem(id);
         };
@@ -203,80 +196,88 @@ function degRad(deg) {
 }
 
 function loop() {
-  checkIfMobile();
-  context.clearRect(0 ,0, canvas.width, canvas.height);
-  var now = Date.now();
+  resizeIfMobile();
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  let now = Date.now();
   delta = (now - lastTime) / 1000;
   if (delta > 0) {
     runTime += delta;
     wheelRotation += delta * rotationSpeed;
   }
   lastTime = Date.now();
-  wedgeSubdiv = 360 / nameList.length;
+  wedgeSubdiv = 360 / items.length;
 
-  var x;
-  var y;
-  var wedgeRotation;
-  var list_len = nameList.length;
-  for (var i = 0; i < list_len; i++) {
+  let wedgeRotation;
+  let list_len = items.length;
+  for (let i = 0; i < list_len; i++) {
     context.beginPath();
     wedgeRotation = i * wedgeSubdiv + wheelRotation;
-    x = CANVAS_MID_X + Math.cos(degRad(wedgeRotation)) * WHEEL_RADIUS;
-    y = CANVAS_MID_Y + Math.sin(degRad(wedgeRotation)) * WHEEL_RADIUS;
     context.moveTo(CANVAS_MID_X, CANVAS_MID_Y);
 
-    strokeColor('#CDCDCD');
+    strokeColor("#CDCDCD");
     switch (i % 3) {
       case 0:
-        fillColor(wedgeColorA);
+        fillColor(WEDGE_COLOR_A);
         break;
       case 1:
-        fillColor(wedgeColorB);
+        fillColor(WEDGE_COLOR_B);
         break;
       case 2:
-        fillColor(wedgeColorC);
+        fillColor(WEDGE_COLOR_C);
         break;
     }
 
     if (i === list_len - 1) {
-      fillColor(wedgeColorD);
+      fillColor(WEDGE_COLOR_D);
     }
 
-    context.arc(CANVAS_MID_X, CANVAS_MID_Y, WHEEL_RADIUS, degRad(wedgeRotation), degRad(wedgeRotation + wedgeSubdiv));
+    context.arc(
+      CANVAS_MID_X,
+      CANVAS_MID_Y,
+      WHEEL_RADIUS,
+      degRad(wedgeRotation),
+      degRad(wedgeRotation + wedgeSubdiv)
+    );
     context.fill();
     if (i !== 0) {
       context.stroke();
     }
   }
 
-  for (i = 0; i < nameList.length; i++) {
+  for (i = 0; i < items.length; i++) {
     context.beginPath();
-    wedgeRotation = (i * wedgeSubdiv + wheelRotation) + wedgeSubdiv / 2;
-    context.textAlign = 'center';
-    context.font = canvas.width / (is_mobile ? 18 : 24) + 'px Josefin Sans';
-    fillColor('#FFFFFF');
+    wedgeRotation = i * wedgeSubdiv + wheelRotation + wedgeSubdiv / 2;
+    context.textAlign = "center";
+    context.font = "1.5rem Nunito"; 
+    if (i === list_len - 1) {
+      fillColor("#000000")
+    } else {
+      fillColor("#FFFFFF");
+    }
     context.save();
     context.translate(
-        CANVAS_MID_X + Math.cos(degRad(wedgeRotation)) * (WHEEL_RADIUS * wedge_text_position),
-        CANVAS_MID_Y + Math.sin(degRad(wedgeRotation)) * (WHEEL_RADIUS * wedge_text_position)
+      CANVAS_MID_X +
+        Math.cos(degRad(wedgeRotation)) * (WHEEL_RADIUS * wedge_text_position),
+      CANVAS_MID_Y +
+        Math.sin(degRad(wedgeRotation)) * (WHEEL_RADIUS * wedge_text_position)
     );
     context.rotate(degRad(wedgeRotation + 180));
-    context.fillText(nameList[i], 0, 0);
+    context.fillText(items[i], 0, 0);
     context.restore();
   }
 
-  fillColor('#000000');
+  fillColor(CHROME_COLOR);
   context.beginPath();
   context.moveTo(CANVAS_MID_X + canvas.width / 32, canvas.height / 64);
   context.lineTo(CANVAS_MID_X - canvas.width / 32, canvas.height / 64);
   context.lineTo(CANVAS_MID_X, canvas.height / 18);
   context.fill();
 
-  if (!nameList.length) {
+  if (!items.length) {
     context.beginPath();
-    context.textAlign = 'center';
-    context.font = canvas.width / (is_mobile ? 18 : 24) + 'px Josefin Sans';
-    fillColor('#000000');
+    context.textAlign = "center";
+    context.font = canvas.width / (is_mobile ? 18 : 24) + "px Nunito";
+    fillColor(CHROME_COLOR);
     context.fillText(blank_message, CANVAS_MID_X, CANVAS_MID_Y);
   } else {
     context.beginPath();
@@ -285,10 +286,7 @@ function loop() {
   }
 
   rotationSpeed += ROTATION_RESISTANCE * delta;
-
-  if (rotationSpeed < 0) {
-    rotationSpeed = 0;
-  }
+  rotationSpeed = clamp(rotationSpeed, 0)
 
   requestAnimationFrame(loop);
 }
@@ -299,5 +297,20 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
 
-setup();
+/**
+ * Returns a number whose value is limited to the given range.
+ *
+ * Example: limit the output of this computation to between 0 and 255
+ * (x * 255).clamp(0, 255)
+ *
+ * @param {Number} min The lower boundary of the output range
+ * @param {Number} max The upper boundary of the output range
+ * @returns A number in the range [min, max]
+ * @type Number
+ */
+clamp = function(value, min, max) {
+  return Math.min(Math.max(value, min), max || Number.MAX_VALUE);
+};
 
+
+setup();

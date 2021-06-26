@@ -22,7 +22,4 @@
     "url": "https://github.com/AldousP/a-random-wheel/issues"
   },
   "homepage": "https://github.com/AldousP/a-random-wheel#readme",
-  "dependencies": {
-    "font-awesome": "^4.7.0"
-  }
 }
