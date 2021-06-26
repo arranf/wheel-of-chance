@@ -35,13 +35,12 @@ const mobile_canvas_size = 500;
 const wedge_text_position = 0.65; // Distance Along Radius
 const blank_message = "Add some values in the pane.";
 
-
 let is_mobile = false;
 let items = [];
 let last_width = 0;
 let dirty = false;
 
-// 
+//
 function setup() {
   clipboard.style.opacity = 0;
   clipboard.style.width = 0;
@@ -85,7 +84,7 @@ function refreshList() {
 
 function addItem() {
   if (wedge_input && !wedge_input.value) return;
-  items.push(wedge_input.value);
+  items.push(wedge_input.value.substring(0, 22));
   wedge_input.value = "";
   refreshList();
 }
@@ -142,7 +141,7 @@ function resizeIfMobile() {
 function registerInputListeners() {
   btn_addWedge.onclick = addItem;
   wedge_input.onkeyup = function (e) {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       addItem();
     }
   };
@@ -248,9 +247,9 @@ function loop() {
     context.beginPath();
     wedgeRotation = i * wedgeSubdiv + wheelRotation + wedgeSubdiv / 2;
     context.textAlign = "center";
-    context.font = "1.5rem Nunito"; 
+    context.font = "1rem Nunito";
     if (i === list_len - 1) {
-      fillColor("#000000")
+      fillColor("#000000");
     } else {
       fillColor("#FFFFFF");
     }
@@ -286,7 +285,7 @@ function loop() {
   }
 
   rotationSpeed += ROTATION_RESISTANCE * delta;
-  rotationSpeed = clamp(rotationSpeed, 0)
+  rotationSpeed = clamp(rotationSpeed, 0);
 
   requestAnimationFrame(loop);
 }
@@ -308,9 +307,8 @@ function getRandomInt(min, max) {
  * @returns A number in the range [min, max]
  * @type Number
  */
-clamp = function(value, min, max) {
+clamp = function (value, min, max) {
   return Math.min(Math.max(value, min), max || Number.MAX_VALUE);
 };
-
 
 setup();
